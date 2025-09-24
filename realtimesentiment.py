@@ -7,9 +7,9 @@ Original file is located at
     https://colab.research.google.com/drive/1JgihMd-I47fpIXG_ZAvk-EZZXOCmfCrJ
 """
 
-pip install gnews
 
-pip install requests
+
+
 
 import requests
 
