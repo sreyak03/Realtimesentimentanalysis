@@ -81,7 +81,7 @@ model = pipeline.fit(train_df)
 predictions = model.transform(test_df)
 predictions.select("headline", "label", "prediction").show(truncate=False)
 
-pip install streamlit pandas plotly
+
 
 import pandas as pd
 from gnews import GNews
