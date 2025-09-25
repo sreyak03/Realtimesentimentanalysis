@@ -3,4 +3,4 @@ pandas
 plotly
 textblob
 gnews
-pyspark
+
