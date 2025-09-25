@@ -10,41 +10,36 @@ Original file is located at
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+from gnews import GNews
+from textblob import TextBlob
 import time
-from fetch_news import get_labeled_headlines
-from spark_model import train_model
-from pyspark.sql import SparkSession
 
 st.set_page_config(page_title="Real-Time News Sentiment", layout="wide")
 st.title("📰 Real-Time News Sentiment Dashboard")
 
-# Initialize Spark
-spark = SparkSession.builder.appName("NewsSentimentApp").getOrCreate()
+news = GNews(language='en')
 
-# Fetch and prepare initial data
-headlines = get_labeled_headlines(50)
-df = pd.DataFrame(headlines, columns=["headline", "label"])
-train_df = spark.createDataFrame(df)
+def fetch_and_classify(limit=20):
+    articles = news.get_top_news()[:limit]
+    data = []
+    for article in articles:
+        title = article['title']
+        polarity = TextBlob(title).sentiment.polarity
+        sentiment = "Positive" if polarity > 0 else "Negative"
+        data.append((title, sentiment))
+    return pd.DataFrame(data, columns=["headline", "sentiment"])
 
-# Train model
-model, spark = train_model(train_df)
-
-# Dashboard placeholders
 table_placeholder = st.empty()
 chart_placeholder = st.empty()
 
 while True:
-    new_headlines = get_labeled_headlines(20)
-    new_df = pd.DataFrame(new_headlines, columns=["headline", "label"])
-    spark_df = spark.createDataFrame(new_df[["headline"]])
-
-    predictions = model.transform(spark_df).toPandas()
+    df = fetch_and_classify(20)
 
     # Show table
-    table_placeholder.dataframe(predictions)
+    table_placeholder.dataframe(df)
 
-    # Plot sentiment distribution
-    fig = px.histogram(predictions, x="prediction", title="Real-Time Sentiment Distribution")
+    # Show chart
+    fig = px.histogram(df, x="sentiment", title="Sentiment Distribution", color="sentiment")
     chart_placeholder.plotly_chart(fig)
 
     time.sleep(60)  # refresh every minute
