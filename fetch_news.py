@@ -7,7 +7,7 @@ Original file is located at
     https://colab.research.google.com/drive/1DFFBSDMbv_eoVfATqbhEC7OYCl-8kyEM
 """
 
-pip install gnews
+
 
 from gnews import GNews
 from textblob import TextBlob
